@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>情绪温柔治愈馆</title>
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  body {
+    font-family: "Microsoft YaHei", sans-serif;
+    background: linear-gradient(135deg, #f0f9ff 0%, #e6f7ff 30%, #f5f0ff 100%);
+    background-attachment: fixed;
+    min-height: 100vh;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .container {
+    width: 100%;
+    max-width: 540px;
+  }
+  .card {
+    background: #ffffff;
+    border-radius: 28px;
+    padding: 45px 35px;
+    box-shadow: 0 25px 60px rgba(120, 150, 200, 0.12);
+    overflow: hidden;
+    position: relative;
+  }
+  .card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 6px;
+    background: linear-gradient(90deg, #91c7ff, #8c9eff, #b892ff);
+  }
+  .icon {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  .icon img {
+    width: 60px;
+    height: 60px;
+  }
+  .title {
+    font-size: 23px;
+    color: #333;
+    text-align: center;
+    margin-bottom: 26px;
+    font-weight: 500;
+  }
+  .daily-line {
+    background: linear-gradient(90deg, #f7fcff, #f0f7ff);
+    border-left: 4px solid #91c7ff;
+    padding: 18px 20px;
+    border-radius: 16px;
+    font-size: 15px;
+    color: #4a6288;
+    line-height: 1.6;
+    margin-bottom: 22px;
+    min-height: 65px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+  .mood-box {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 32px;
+  }
+  .neg, .pos {
+    padding: 20px;
+    border-radius: 18px;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+  .neg {
+    background: #fff5f5;
+    color: #c75656;
+    border-left: 4px solid #f2a0a0;
+  }
+  .pos {
+    background: #f2fff7;
+    color: #389b6e;
+    border-left: 4px solid #76d49f;
+  }
+  .btn-box {
+    text-align: center;
+  }
+  button {
+    background: linear-gradient(90deg, #8cb6f4, #74a6e8);
+    color: #fff;
+    border: none;
+    padding: 17px 42px;
+    border-radius: 30px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 10px 24px rgba(116, 166, 232, 0.25);
+  }
+  button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 14px 28px rgba(116, 166, 232, 0.35);
+  }
+  button:active {
+    transform: translateY(0);
+  }
+</style>
+</head>
+
+<body>
+<div class="container">
+  <div class="card">
+    <div class="icon">
+      <img src="https://cdn-icons-png.flaticon.com/512/2922/2922560.png" alt="温柔治愈">
+    </div>
+    <div class="title">情绪温柔治愈馆</div>
+
+    <div class="daily-line" id="daily">正在获取今日温柔...</div>
+
+    <div class="mood-box">
+      <div class="neg" id="neg">正在加载...</div>
+      <div class="pos" id="pos">正在加载...</div>
+    </div>
+
+    <div class="btn-box">
+      <button onclick="refreshAll()">点我 · 治愈一刻</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const moodList = [
+  { neg: "我不行", pos: "我现在有点难，但我可以慢慢来" },
+  { neg: "我真没用", pos: "我只是累了，不是没用" },
+  { neg: "我好害怕", pos: "我可以害怕，害怕是正常的" },
+  { neg: "我撑不下去了", pos: "我可以先休息，不用硬撑" },
+  { neg: "都是我的错", pos: "这不是我一个人的责任" },
+  { neg: "我什么都做不好", pos: "我不用什么都做好" },
+  { neg: "我好焦虑", pos: "焦虑是因为我在乎，不是我错" },
+  { neg: "没人理解我", pos: "我可以先理解我自己" },
+  { neg: "我不该这样", pos: "我这样是有原因的，我可以被允许" },
+  { neg: "我太失败了", pos: "这只是一次经历，不是我的全部" },
+  { neg: "我不够好", pos: "我已经足够好了，不需要证明" },
+  { neg: "我总在犯错", pos: "犯错是成长，不是我的污点" },
+  { neg: "我没人爱", pos: "我值得被爱，也可以先爱自己" },
+  { neg: "我好孤独", pos: "孤独是暂时的，我可以陪伴自己" },
+  { neg: "我没希望了", pos: "慢慢来，希望会一点点出现" },
+  { neg: "我太敏感了", pos: "敏感是我的特质，不是缺点" },
+  { neg: "我总被否定", pos: "别人的评价，定义不了我" },
+  { neg: "我不敢尝试", pos: "我可以小步试，不用一步到位" },
+  { neg: "我总拖延", pos: "我可以先做5分钟，不用完美" },
+  { neg: "我好迷茫", pos: "迷茫很正常，我不用急着有答案" },
+  { neg: "我不够努力", pos: "我已经在尽力，别苛责自己" },
+  { neg: "我总后悔", pos: "过去的已经过去，我可以向前看" },
+  { neg: "我好脆弱", pos: "脆弱不是软弱，是我在真实活着" },
+  { neg: "我总担心", pos: "我可以担心，但不必被它困住" },
+  { neg: "我不配拥有", pos: "我值得一切美好" },
+  { neg: "我总被忽视", pos: "我值得被看见，也可以看见自己" },
+  { neg: "我好无力", pos: "我可以先做一点点，力量会回来" },
+  { neg: "我总在比较", pos: "我有自己的节奏，不用跟别人比" },
+  { neg: "我好自责", pos: "我可以原谅自己，放过自己" },
+  { neg: "我没价值", pos: "我的存在本身，就有意义" },
+  { neg: "我不想动", pos: "我可以休息，休息不是浪费" },
+  { neg: "我好压抑", pos: "我可以释放情绪，不用憋着" },
+  { neg: "我好委屈", pos: "我的委屈值得被看见，包括我自己" },
+  { neg: "我想逃避", pos: "想逃是本能，我可以先喘口气" },
+  { neg: "我不被喜欢", pos: "我不需要所有人喜欢" },
+  { neg: "我总添麻烦", pos: "我可以被帮助，不必一直强撑" },
+  { neg: "我好绝望", pos: "绝望是一时的，不是永远" },
+  { neg: "我不值得被善待", pos: "我值得被温柔对待" },
+  { neg: "我总是让别人失望", pos: "我不必满足所有人期待" },
+  { neg: "我好笨", pos: "我只是需要多一点时间" },
+  { neg: "我没有未来", pos: "未来还远，我可以慢慢走" },
+  { neg: "我总是不开心", pos: "我可以不开心，情绪没有对错" },
+  { neg: "我好疲惫", pos: "我可以停下来，不用一直赶路" },
+  { neg: "我不敢表达", pos: "我的感受很重要，值得说出来" },
+  { neg: "我总被忽略", pos: "我也可以被重视" },
+  { neg: "我好纠结", pos: "我可以慢慢选，不用立刻正确" },
+  { neg: "我害怕被讨厌", pos: "我不可能被所有人喜欢" },
+  { neg: "我不够坚强", pos: "坚强不是不疼，是疼也还在走" },
+  { neg: "我总胡思乱想", pos: "我可以把心放下，一点点回来" },
+  { neg: "我好无助", pos: "我可以求助，不必一个人扛" },
+  { neg: "我不想面对", pos: "我可以暂时不面对，先照顾自己" },
+  { neg: "我好紧张", pos: "紧张很正常，我可以慢慢放松" },
+  { neg: "我总怀疑自己", pos: "我可以相信自己一次" },
+  { neg: "我好难过", pos: "我可以难过，允许自己哭一会" },
+  { neg: "我没有安全感", pos: "我可以慢慢给自己安全感" },
+  { neg: "我总讨好别人", pos: "我也可以优先照顾自己" },
+  { neg: "我好空虚", pos: "我可以慢慢填满，不用急" },
+  { neg: "我不敢拒绝", pos: "我可以说不，这是我的权利" },
+  { neg: "我总放不下", pos: "我可以放下，放过自己" },
+  { neg: "我好痛苦", pos: "痛苦会过去，我会慢慢好起来" }
+];
+
+async function getHitokoto() {
+  try {
+    const res = await fetch("https://v1.hitokoto.cn/?c=i");
+    const data = await res.json();
+    return data.hitokoto || "慢慢来，你已经很好了。";
+  } catch (e) {
+    return "慢慢来，你已经很好了。";
+  }
+}
+
+function getMood() {
+  return moodList[Math.floor(Math.random() * moodList.length)];
+}
+
+async function refreshAll() {
+  const dailyDom = document.getElementById("daily");
+  const negDom = document.getElementById("neg");
+  const posDom = document.getElementById("pos");
+
+  dailyDom.innerText = "正在为你寻找温柔...";
+  negDom.innerText = "正在读取...";
+  posDom.innerText = "正在读取...";
+
+  const daily = await getHitokoto();
+  const mood = getMood();
+
+  dailyDom.innerText = daily;
+  negDom.innerText = "❌ " + mood.neg;
+  posDom.innerText = "✅ " + mood.pos;
+}
+
+window.onload = () => {
+  refreshAll();
+};
+</script>
+</body>
+</html>
